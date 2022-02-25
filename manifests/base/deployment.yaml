@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/component: consumer
+    app.kubernetes.io/name: datalake-query-db-consumer
+  name: datalake-query-db-consumer
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: consumer
+      app.kubernetes.io/name: datalake-query-db-consumer
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/component: consumer
+        app.kubernetes.io/name: datalake-query-db-consumer
+    spec:
+      containers:
+        - name: datalake-query-db-consumer
+          image: "711570343235.dkr.ecr.us-west-2.amazonaws.com/datalake-query-db-consumer:latest"
+          imagePullPolicy: Always
+          env:
+            - name: DATALAKEQUERYDBCONSUMER_KAFKA_TOPIC
+              valueFrom:
+                configMapKeyRef:
+                  name: datalake-query-db-consumer-configmap
+                  key: DATALAKEQUERYDBCONSUMER_KAFKA_TOPIC
+            - name: KAFKA_BROKERS
+              valueFrom:
+                configMapKeyRef:
+                  name: datalake-query-db-consumer-configmap
+                  key: KAFKA_BROKERS
+            - name: DATALAKEQUERYDBCONSUMER_DB_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: datalake-query-db-consumer-configmap
+                  key: DATALAKEQUERYDBCONSUMER_DB_URL
+            - name: DATALAKEQUERYDBCONSUMER_KAFKA_GROUP_ID
+              valueFrom:
+                configMapKeyRef:
+                  name: datalake-query-db-consumer-configmap
+                  key: DATALAKEQUERYDBCONSUMER_KAFKA_GROUP_ID
+          command: [ "/bin/sh" ]
+          args: [ "-c", "python3.9 -m bloomberg.datalake.datalakequerydbconsumer" ]
+      restartPolicy: Always

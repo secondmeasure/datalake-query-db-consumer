@@ -1,0 +1,14 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: kafka
+
+resources:
+  - deployment.yaml
+
+configMapGenerator:
+  - name: datalake-query-db-consumer-configmap
+    literals:
+      - DATALAKEQUERYDBCONSUMER_DB_URL=postgresql://raw_metrics_rw:foobar@sm-platform-data-interface-metastores.cbd62wyx2zhb.us-east-2.rds.amazonaws.com:5432/datalake_analytics
+      - DATALAKEQUERYDBCONSUMER_KAFKA_GROUP_ID=trino
+      - DATALAKEQUERYDBCONSUMER_KAFKA_TOPIC=datalake-query-ingester
+      - KAFKA_BROKERS=datalake-query-ingester-kafka-bootstrap:9092
